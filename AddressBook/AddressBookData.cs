@@ -10,7 +10,7 @@ namespace AddressBook
 {
     public class AddressBookData
     {
-       
+        
         public static void Create_Database()
         {
             try
@@ -27,7 +27,7 @@ namespace AddressBook
                 Console.WriteLine("exception occured while creating database:" + e.Message + "\t");
             }
         }
-        
+     
         public static void CreateTables()
         {
             try
@@ -36,7 +36,7 @@ namespace AddressBook
                 con.Open();
                 SqlCommand cmd = new SqlCommand("Create table AddressBook(id int identity(1,1)primary key,First_Name varchar(200),Last_Name varchar(200),Address varchar(200), City varchar(200), State varchar(200), Zip varchar(200), Phone_Number varchar(50), Email varchar(200)); ", con);
                 cmd.ExecuteNonQuery();
-                Console.WriteLine("Address book table has been  created successfully!");
+                Console.WriteLine("AddressBook table has been  created successfully!");
                 con.Close();
             }
             catch (Exception e)
@@ -64,9 +64,44 @@ namespace AddressBook
                     cmd.Parameters.AddWithValue("@Zip", model.Zip);
                     cmd.Parameters.AddWithValue("@Phone_Number", model.Phone_Number);
                     cmd.Parameters.AddWithValue("@Email", model.Email);
-                   
+                  
                     this.connection.Open();
+                    var result = cmd.ExecuteNonQuery();
+                    this.connection.Close();
+                    if (result != 0)
+                    {
+                        return true;
+                    }
+                    return false;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            finally
+            {
+                this.connection.Close();
+            }
+            return false;
+        }
 
+        public bool UpdateContact(AddressBookModel model)
+        {
+            try
+            {
+                using (this.connection)
+                {
+                    SqlCommand cmd = new SqlCommand("SpAddressBook_Update", this.connection);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@First_Name", model.First_Name);
+                    cmd.Parameters.AddWithValue("@Last_Name", model.Last_Name);
+                    cmd.Parameters.AddWithValue("@Address", model.Address);
+                    cmd.Parameters.AddWithValue("@City", model.City);
+                    cmd.Parameters.AddWithValue("@State", model.State);
+                    cmd.Parameters.AddWithValue("@Zip", model.Zip);
+                    cmd.Parameters.AddWithValue("@Phone_Number", model.Phone_Number);
+                    cmd.Parameters.AddWithValue("@Email", model.Email);
                     var result = cmd.ExecuteNonQuery();
                     this.connection.Close();
                     if (result != 0)
@@ -112,7 +147,6 @@ namespace AddressBook
                             addressmodel.Zip = datareader.GetString(6);
                             addressmodel.Phone_Number = datareader.GetString(7);
                             addressmodel.Email = datareader.GetString(8);
-                 
                             Console.WriteLine(addressmodel.First_Name + " " +
                                 addressmodel.Last_Name + " " +
                                 addressmodel.Address + " " +
@@ -121,7 +155,7 @@ namespace AddressBook
                                 addressmodel.Zip + " " +
                                 addressmodel.Phone_Number + " " +
                                 addressmodel.Email 
-                               
+                                
                                 );
                             Console.WriteLine("------------------------------------------------------------");
                         }
