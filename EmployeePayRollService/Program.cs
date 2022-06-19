@@ -1,55 +1,80 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
 
-namespace ADO.NetDatabaseCon
+namespace EmployeePay
 {
     public class Program
     {
-
         public static void Main(string[] args)
         {
-            Program program = new Program();
-
-            program.EstablishConnection();
-            Console.WriteLine("Welcome to EmployeePayroll ADO.NET");
-            Console.WriteLine("Connection establised");
-        }
-        static string connectionString = "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=Payroll_Service;Integrated Security=SSPI";
-        static SqlConnection connection = new SqlConnection(connectionString);
-        public void EstablishConnection()
-        {
-            if (connection != null && connection.State.Equals(ConnectionState.Closed))
+            Console.WriteLine("Welcome in Employee Payroll Service");
+            EmployeePayRoll employeepayroll = new EmployeePayRoll();
+            int option = 0;
+            do
             {
-                try
+                Console.WriteLine("1: Establish Connection");
+                Console.WriteLine("2: Close Connection");
+                Console.WriteLine("3: Add Employee Data");
+                Console.WriteLine("0: Exit");
+                option = int.Parse(Console.ReadLine());
+                switch (option)
                 {
-                    connection.Open();
-
-                }
-                catch (Exception)
-                {
-                    throw new Exceptions(Exceptions.ExceptionType.ConnectionFailed, "Connection Failed.");
+                    case 1:
+                        employeepayroll.EstablishConnection();
+                        break;
+                    case 2:
+                        employeepayroll.CloseConnection();
+                        break;
+                    case 3:
+                        Employee emp = new Employee();
+                        Console.WriteLine("Enter The Name");
+                        string name = Console.ReadLine();
+                        emp.Name = name;
+                        Console.WriteLine("Enter a salary");
+                        string Salary = Console.ReadLine();
+                        emp.Salary = Salary;
+                        Console.WriteLine("Enter a Gender");
+                        string gender = Console.ReadLine();
+                        emp.Gender = gender;
+                        Console.WriteLine("Enter Phone number");
+                        double Phone = Convert.ToInt64(Console.ReadLine());
+                        emp.PhoneNumber = Phone;
+                        Console.WriteLine("Enter a Address");
+                        string address = Console.ReadLine();
+                        emp.Address = address;
+                        Console.WriteLine("Enter a Department");
+                        string Department = Console.ReadLine();
+                        emp.Department = Department;
+                        Console.WriteLine(" Emplyoee Join Date");
+                        string date = Console.ReadLine();
+                        emp.StartDate = Convert.ToDateTime(date);
+                       
+                        Console.WriteLine("Enter a Basic Pay");
+                        double basicpay = Convert.ToInt64(Console.ReadLine());
+                        emp.BasicPay = basicpay;
+                        Console.WriteLine("Enter a Deduction");
+                        int Deduictions = int.Parse(Console.ReadLine());
+                        emp.Deduictions = Deduictions;
+                        Console.WriteLine("Enter a Taxable Pay");
+                        int taxablepay = int.Parse(Console.ReadLine());
+                        emp.TaxablePay = taxablepay;
+                        Console.WriteLine("Enter a Income Tax");
+                        int Incometax = int.Parse(Console.ReadLine());
+                        emp.IncomeTax = Incometax;
+                        Console.WriteLine("Enter a NetPay");
+                        int netpay = int.Parse(Console.ReadLine());
+                        emp.NetPay = netpay;
+                        employeepayroll.sp_payroll_service(emp);
+                        break;
+                    case 0:
+                        Console.WriteLine("Exit");
+                        break;
+                    default:
+                        Console.WriteLine("Invalid Option:---Please Enter Correct Option");
+                        break;
                 }
             }
-            static void ClosedConnection()
-            {
-                if (connection != null && connection.State.Equals(ConnectionState.Open))
-                {
-                    try
-                    {
-                        connection.Close();
-                    }
-                    catch
-                    {
-                        throw new Exceptions(Exceptions.ExceptionType.ConnectionFailed, "Connection Failed.");
-                    }
-
-                }
-
-            }
+            while (option != 0);
         }
-
     }
 }
 

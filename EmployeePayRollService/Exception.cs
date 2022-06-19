@@ -4,20 +4,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ADO.NetDatabaseCon
+namespace EmployeePay
 {
-    public class Exceptions : Exception
+    public class EmployeeException : Exception
     {
-        ExceptionType type;
         public enum ExceptionType
         {
-            ConnectionFailed
+            NO_DATA_FOUND,
+            INSERTION_ERROR,
+            NO_SUCH_SQL_PROCEDURE,
+            CONNECTION_FAILED,
         }
-        public Exceptions(ExceptionType type, string message) : base(message)
+        ExceptionType type;
+       
+        public EmployeeException(ExceptionType type, string message) : base(message)
         {
             this.type = type;
         }
     }
 }
-
 
