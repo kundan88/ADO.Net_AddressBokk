@@ -4,7 +4,7 @@
     {
         public static void Main(string[] args)
         {
-            Console.WriteLine("Welcome in Address Book");
+            Console.WriteLine(" Address Book");
             AddressBook address = new AddressBook();
             AddressBookDetail addressBookDetail = new AddressBookDetail();
             int option = 0;
@@ -14,6 +14,9 @@
                 Console.WriteLine("2: For Close Connection");
                 Console.WriteLine("3: Insert Addressbook Details");
                 Console.WriteLine("4: For retrieve AddressBook Details");
+                Console.WriteLine("5: For Update Addressbook Details");
+                Console.WriteLine("6: To Remove AddressBook Details");
+                Console.WriteLine("7: To Retrieve by City and State Name");
                 Console.WriteLine("0: For Exit");
                 option = Convert.ToInt32(Console.ReadLine());
                 switch (option)
@@ -57,7 +60,51 @@
                         addressBookDetail.InsertAddressData(address);
                         break;
                     case 4:
-                        addressBookDetail.RetrieveAddressBookDetails();
+                        addressBookDetail.RetrieveAddressBookInfo();
+                        break;
+                    case 5:
+                        Console.WriteLine("Enter ID");
+                        int iD = Convert.ToInt32(Console.ReadLine());
+                        address.ID = iD;
+                        Console.WriteLine("Enter First Name");
+                        string firstname1 = Console.ReadLine();
+                        address.FirstName = firstname1;
+                        Console.WriteLine("Enter Last Name");
+                        string lastname1 = Console.ReadLine();
+                        address.LastName = lastname1;
+                        Console.WriteLine("Enter Address");
+                        string address2 = Console.ReadLine();
+                        address.Address = address2;
+                        Console.WriteLine("Enter City");
+                        string city1 = Console.ReadLine();
+                        address.City = city1;
+                        Console.WriteLine("Enter state");
+                        string state1 = Console.ReadLine();
+                        address.State = state1;
+                        Console.WriteLine("Enter zip");
+                        double zip1 = Convert.ToInt64(Console.ReadLine());
+                        address.Zip = zip1;
+                        Console.WriteLine("Enter phone number");
+                        double phone1 = Convert.ToInt64(Console.ReadLine());
+                        address.PhoneNumber = phone1;
+                        Console.WriteLine("Enter email");
+                        string email1 = Console.ReadLine();
+                        address.Email = email1;
+                        addressBookDetail.UpdateDetails(address);
+                        break;
+                    case 6:
+                        Console.WriteLine("Enter ID");
+                        int Id = Convert.ToInt32(Console.ReadLine());
+                        address.ID = Id;
+                        addressBookDetail.RemoveContact(address);
+                        break;
+                    case 7:
+                        Console.WriteLine("Enter city and state");
+                        string cityname = Console.ReadLine();
+                        address.City = cityname;
+                        string statename = Console.ReadLine();
+                        address.State = statename;
+                        addressBookDetail.GetDataFromCityAndState(address);
                         break;
                     default:
                         Console.WriteLine("Enter a Valid Input");
