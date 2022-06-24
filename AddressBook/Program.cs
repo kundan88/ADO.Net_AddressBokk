@@ -1,57 +1,71 @@
-﻿using AddressBook;
-
-Console.WriteLine("AddressBook System");
-Console.WriteLine("Select option\n1)Create AddrssBookServiceDatabase\n2)Create Table\n3)Insert Contact\n" +
-    "4)Update Details\n5)Fetch COntacts");
-int op = Convert.ToInt16(Console.ReadLine());
-AddressBookData ad = new AddressBookData();
-AddressBookModel addressbook = new AddressBookModel();
-
-switch (op)
+﻿namespace AddressBook
 {
-    case 1:
-        AddressBookData.Create_Database();
-        break;
-    case 2:
-        AddressBookData.CreateTables();
-        break;
-    case 3:
-        Console.WriteLine("Welcome to Address Book");
-        addressbook.First_Name = "sunil";
-        addressbook.Last_Name = "kamble";
-        addressbook.Address = "Mumbai";
-        addressbook.City = "Mumbai";
-        addressbook.State = "Maharashtra";
-        addressbook.Zip = "400005";
-        addressbook.Phone_Number = "7410741141";
-        addressbook.Email = "kundan@gmail.com";
-        ad.AddContact(addressbook);
-        Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine("Record Inserted successfully");
-        Console.ResetColor();
-        break;
-    case 4:
-        Console.WriteLine("Welcome to Address Book");
-        addressbook.First_Name = "";
-        addressbook.Last_Name = "Kadam";
-        addressbook.Address = "colaba";
-        addressbook.City = "mumbai";
-        addressbook.State = "Mahgarashtra";
-        addressbook.Zip = "400005";
-        addressbook.Phone_Number = "9844335566";
-        addressbook.Email = "sunil@gmail.com";
-        
-        ad.UpdateContact
-            (addressbook);
-        Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine("Record Updated successfully");
-        Console.ResetColor();
-        break;
-    case 5:
-        ad.GetAllContact();
-        break;
-    default:
-        Console.WriteLine("Wrong Choice");
-        break;
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            Console.WriteLine("Welcome in Address Book");
+            AddressBook address = new AddressBook();
+            AddressBookDetail addressBookDetail = new AddressBookDetail();
+            int option = 0;
+            do
+            {
+                Console.WriteLine("1: For Establish Connection");
+                Console.WriteLine("2: For Close Connection");
+                Console.WriteLine("3: Insert Addressbook Details");
+                Console.WriteLine("4: For retrieve AddressBook Details");
+                Console.WriteLine("0: For Exit");
+                option = Convert.ToInt32(Console.ReadLine());
+                switch (option)
+                {
+                    case 0:
+                        Console.WriteLine("Exit");
+                        break;
+                    case 1:
+                        addressBookDetail.EstablishConnection();
+                        Console.WriteLine("Connection is Open");
+                        break;
+                    case 2:
+                        addressBookDetail.CloseConnection();
+                        Console.WriteLine("Connection is closed");
+                        break;
+                    case 3:
+                        Console.WriteLine("Enter First Name");
+                        string firstname = Console.ReadLine();
+                        address.FirstName = firstname;
+                        Console.WriteLine("Enter Last Name");
+                        string lastname = Console.ReadLine();
+                        address.LastName = lastname;
+                        Console.WriteLine("Enter Address");
+                        string address1 = Console.ReadLine();
+                        address.Address = address1;
+                        Console.WriteLine("Enter City");
+                        string city = Console.ReadLine();
+                        address.City = city;
+                        Console.WriteLine("Enter state");
+                        string state = Console.ReadLine();
+                        address.State = state;
+                        Console.WriteLine("Enter zip");
+                        double zip = Convert.ToInt64(Console.ReadLine());
+                        address.Zip = zip;
+                        Console.WriteLine("Enter phone number");
+                        double phone = Convert.ToInt64(Console.ReadLine());
+                        address.PhoneNumber = phone;
+                        Console.WriteLine("Enter email");
+                        string email = Console.ReadLine();
+                        address.Email = email;
+                        addressBookDetail.InsertAddressData(address);
+                        break;
+                    case 4:
+                        addressBookDetail.RetrieveAddressBookDetails();
+                        break;
+                    default:
+                        Console.WriteLine("Enter a Valid Input");
+                        break;
+                }
+            }
+            while (option != 0);
+        }
+    }
 }
 

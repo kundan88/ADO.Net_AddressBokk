@@ -8,164 +8,114 @@ using System.Threading.Tasks;
 
 namespace AddressBook
 {
-    public class AddressBookData
+    public class AddressBookDetail
     {
-        
-        public static void Create_Database()
+        static string connectionString = @"Data Source = (localdb)\MSSQLLocalDB; Initial Catalog = AddressBook; Integrated Security = SSPI";
+        static SqlConnection connection = new SqlConnection(connectionString);
+
+        public void EstablishConnection()
         {
-            try
+            if (connection != null && connection.State.Equals(ConnectionState.Closed))
             {
-                SqlConnection con = new SqlConnection(@"Data Source=(localdb)\MSSQLLocalDB; Initial Catalog =master; Integrated Security = True;");
-                con.Open();
-                SqlCommand cmd = new SqlCommand("Create database AddressbookService;", con);
-                cmd.ExecuteNonQuery();
-                Console.WriteLine("AddressbookService Database created successfully!");
-                con.Close();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("exception occured while creating database:" + e.Message + "\t");
-            }
-        }
-     
-        public static void CreateTables()
-        {
-            try
-            {
-                SqlConnection con = new SqlConnection(@"Data Source=(localdb)\MSSQLLocalDB; Initial Catalog =AddressbookService; Integrated Security = True;");
-                con.Open();
-                SqlCommand cmd = new SqlCommand("Create table AddressBook(id int identity(1,1)primary key,First_Name varchar(200),Last_Name varchar(200),Address varchar(200), City varchar(200), State varchar(200), Zip varchar(200), Phone_Number varchar(50), Email varchar(200)); ", con);
-                cmd.ExecuteNonQuery();
-                Console.WriteLine("AddressBook table has been  created successfully!");
-                con.Close();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("exception occured while creating table:" + e.Message + "\t");
-            }
-        }
-        //Created Connection file
-        public const string ConnFile = @"Data Source=(localdb)\MSSQLLocalDB; Initial Catalog =AddressbookService; Integrated Security = True;";
-        SqlConnection connection = new SqlConnection(ConnFile);
-       
-        public bool AddContact(AddressBookModel model)
-        {
-            try
-            {
-                using (this.connection)
+                try
                 {
-                    SqlCommand cmd = new SqlCommand("SpAddressBook", this.connection);
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@First_Name", model.First_Name);
-                    cmd.Parameters.AddWithValue("@Last_Name", model.Last_Name);
-                    cmd.Parameters.AddWithValue("@Address", model.Address);
-                    cmd.Parameters.AddWithValue("@City", model.City);
-                    cmd.Parameters.AddWithValue("@State", model.State);
-                    cmd.Parameters.AddWithValue("@Zip", model.Zip);
-                    cmd.Parameters.AddWithValue("@Phone_Number", model.Phone_Number);
-                    cmd.Parameters.AddWithValue("@Email", model.Email);
-                  
-                    this.connection.Open();
-                    var result = cmd.ExecuteNonQuery();
-                    this.connection.Close();
-                    if (result != 0)
-                    {
-                        return true;
-                    }
-                    return false;
+                    connection.Open();
+                }
+                catch (Exception)
+                {
+                    throw new AddressException(AddressException.ExceptionType.CONNECTION_FAILED, "Connection not found");
                 }
             }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
-            finally
-            {
-                this.connection.Close();
-            }
-            return false;
         }
-
-        public bool UpdateContact(AddressBookModel model)
+        public void CloseConnection()
         {
-            try
+            if (connection != null && connection.State.Equals(ConnectionState.Open))
             {
-                using (this.connection)
+                try
                 {
-                    SqlCommand cmd = new SqlCommand("SpAddressBook_Update", this.connection);
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@First_Name", model.First_Name);
-                    cmd.Parameters.AddWithValue("@Last_Name", model.Last_Name);
-                    cmd.Parameters.AddWithValue("@Address", model.Address);
-                    cmd.Parameters.AddWithValue("@City", model.City);
-                    cmd.Parameters.AddWithValue("@State", model.State);
-                    cmd.Parameters.AddWithValue("@Zip", model.Zip);
-                    cmd.Parameters.AddWithValue("@Phone_Number", model.Phone_Number);
-                    cmd.Parameters.AddWithValue("@Email", model.Email);
-                    var result = cmd.ExecuteNonQuery();
-                    this.connection.Close();
-                    if (result != 0)
-                    {
-                        return true;
-                    }
-                    return false;
+                    connection.Close();
+                }
+                catch (Exception)
+                {
+                    throw new AddressException(AddressException.ExceptionType.CONNECTION_FAILED, "Connection not found");
                 }
             }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
-            finally
-            {
-                this.connection.Close();
-            }
-            return false;
         }
-
-       
-        public void GetAllContact()
+        public int InsertAddressData(AddressBook address)
         {
+            SqlConnection connection = new SqlConnection(connectionString);
             try
             {
-                AddressBookModel addressmodel = new AddressBookModel();
-                using (this.connection)
+                using (connection)
                 {
-                    string Query = @"Select * from AddressBook";
-                    SqlCommand cmd = new SqlCommand(Query, this.connection);
-                    this.connection.Open();
-                    SqlDataReader datareader = cmd.ExecuteReader();
-                    if (datareader.HasRows)
+                    connection.Open();
+                    SqlCommand command = new SqlCommand("Add_Details", connection)
                     {
-                        while (datareader.Read())
+                        CommandType = CommandType.StoredProcedure
+                    };
+                    command.Parameters.AddWithValue("@FirstName", address.FirstName);
+                    command.Parameters.AddWithValue("@LastName", address.LastName);
+                    command.Parameters.AddWithValue("@Address", address.Address);
+                    command.Parameters.AddWithValue("@City", address.City);
+                    command.Parameters.AddWithValue("@State", address.State);
+                    command.Parameters.AddWithValue("@Zip", address.Zip);
+                    command.Parameters.AddWithValue("@PhoneNumber", address.PhoneNumber);
+                    command.Parameters.AddWithValue("@Email", address.Email);
+                    var returnParameter = command.Parameters.Add("@new_identity", SqlDbType.Int);
+                    returnParameter.Direction = ParameterDirection.ReturnValue;
+                    Console.WriteLine(address.FirstName + "," + address.LastName + "," + address.Address + "," + address.City + "," + address.State + "," + address.Zip + "," + address.PhoneNumber + "," + address.Email);
+                    command.ExecuteNonQuery();
+                    connection.Close();
+                    var result = returnParameter.Value;
+                    return (int)result;
+                    Console.WriteLine("Contact is added");
+                }
+            }
+            catch (Exception)
+            {
+                throw new AddressException(AddressException.ExceptionType.INSERTION_ERROR, "Insertion failed");
+            }
+            return 0;
+        }
+        public List<AddressBook> RetrieveAddressBookDetails()
+        {
+            List<AddressBook> list = new List<AddressBook>();
+            AddressBook address = new AddressBook();
+            SqlConnection connection = new SqlConnection(connectionString);
+            try
+            {
+                using (connection)
+                {
+                    SqlCommand command = new SqlCommand("RetrieveDetails", connection);
+                    command.CommandType = CommandType.StoredProcedure;
+                    connection.Open();
+                    SqlDataReader reader = command.ExecuteReader();
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
                         {
-                            addressmodel.AddressBookId = datareader.GetInt32(0);
-                            addressmodel.First_Name = datareader.GetString(1);
-                            addressmodel.Last_Name = datareader.GetString(2);
-                            addressmodel.Address = datareader.GetString(3);
-                            addressmodel.City = datareader.GetString(4);
-                            addressmodel.State = datareader.GetString(5);
-                            addressmodel.Zip = datareader.GetString(6);
-                            addressmodel.Phone_Number = datareader.GetString(7);
-                            addressmodel.Email = datareader.GetString(8);
-                            Console.WriteLine(addressmodel.First_Name + " " +
-                                addressmodel.Last_Name + " " +
-                                addressmodel.Address + " " +
-                                addressmodel.City + " " +
-                                addressmodel.State + " " +
-                                addressmodel.Zip + " " +
-                                addressmodel.Phone_Number + " " +
-                                addressmodel.Email 
-                                
-                                );
-                            Console.WriteLine("------------------------------------------------------------");
+                           
+                            address.FirstName = reader.GetString(1);
+                            address.LastName = reader.GetString(2);
+                            address.Address = reader.GetString(3);
+                            address.City = reader.GetString(4);
+                            address.State = reader.GetString(5);
+                            address.Zip = reader.GetInt64(6);
+                            address.PhoneNumber = reader.GetInt64(7);
+                            address.Email = reader.GetString(8);
+                            list.Add(address);
+                            Console.WriteLine( address.FirstName + "," + address.LastName + "," + address.Address + "," + address.City + ","
+                                + address.State + "," + address.Zip + "," + address.PhoneNumber + "," + address.Email);
                         }
                     }
+                    connection.Close();
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
+                throw new AddressException(AddressException.ExceptionType.CONTACT_NOT_FOUND, "Contact not found");
             }
+            return list;
         }
     }
 }
